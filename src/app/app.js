@@ -9,8 +9,7 @@ import '../style/app.css';
 
 angular.module('app', [uiRouter])
   .controller('AddressController', AddressController)
-  
-  .factory('lead', Lead.factory)
+  .service('Lead', Lead)
 
   .config(($stateProvider, $urlRouterProvider) => {
     $stateProvider
@@ -30,6 +29,9 @@ angular.module('app', [uiRouter])
           modal: {
             template: require('./add.html'),
             controller: 'AddressController',
+            resolve: {
+              lead: ($stateParams, Lead) => Lead.fetchData($stateParams.leadId)
+            },
           },
         },
       });

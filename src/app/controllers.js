@@ -3,12 +3,13 @@
 import GoogleMapsLoader from 'google-maps';
 
 export class AddressController {
-  constructor($scope) {
+  constructor($scope, $timeout, lead) {
     this.$scope = $scope;
 
-    this.list = [];
-    this.type = '';
-
+    $scope.lead = lead.data;
+    $scope.list = lead.data.addresses;
+    $scope.label = 'principal';  
+    
     this.componentForm = {
       street_number: 'short_name',
       route: 'long_name',
@@ -106,9 +107,8 @@ export class AddressController {
 
   addAutocompleteHandler(marker, place) {
     const address = {
-        place: place,
-        type: this.type,
-        component: {}
+        formatted: place.formatted_address,
+        label: this.$scope.label
       };
 
     if (!place || !('address_components' in place)) {
@@ -120,7 +120,7 @@ export class AddressController {
 
       for (const c in this.componentForm) {
         if (addressType === this.componentForm[c].type) {
-          address.component[c] = component[this.componentForm[c].display];
+          address[c] = component[this.componentForm[c].display];
         }
       }
     });
@@ -137,9 +137,9 @@ export class AddressController {
     marker.setPosition(place.geometry.location);
     marker.setVisible(true);
 
-    this.$scope.$apply(() => this.list.push(address));
+    this.$scope.$apply(() => this.$scope.list.push(address));
     this.addInput.value = '';
   };
 }
 
-AddressController.$inject = ['$scope'];
+AddressController.$inject = ['$scope', '$timeout', 'lead'];

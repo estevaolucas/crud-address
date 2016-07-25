@@ -360,9 +360,16 @@ footer {
             }
           }
 
-          &.add-address {
+          &.add-address
+          , &.editing {
             input.text, ol {
               display: block;
+            }
+          }
+
+          &.editing {
+            .actions {
+              opacity: 0;
             }
           }
         }

@@ -37,6 +37,15 @@ export class Lead {
     
     return deferred.promise;
   }
+
+  removeAddress(address) {
+    const deferred = this.$q.defer();
+
+    this.data.addresses.splice(this.data.addresses.indexOf(address), 1);
+    deferred.resolve(this.data.addresses.slice());
+    
+    return deferred.promise; 
+  }
 }
 
 Lead.$inject = ['$q'];

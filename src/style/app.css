@@ -1,3 +1,11 @@
+$type-principal: #2c7;
+$type-mobile: #39d;
+$type-home: #e43;
+$type-other: #e82;
+
+$gray: #eee;
+$black: #222;
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -61,10 +69,10 @@ footer {
       overflow: hidden;
 
       header {
-        background: #eee;
+        background: $gray;
 
         h1 {
-          color: #222;
+          color: $black;
           text-align: center;
           padding: 10px 0;
           font-size: 24px;
@@ -74,13 +82,14 @@ footer {
         .btn-close {
           text-indent: -999em;
           background: url('../public/img/close.svg');
+          border: none;
+          background-size: contain;
           width: 22px;
           height: 22px;
-          border: none;
           position: absolute;
           right: 22px;
           top: 15px;
-          background-size: contain;
+          cursor: pointer;
         }
       }
 
@@ -92,13 +101,9 @@ footer {
 }
  
 /*
-// TODO:
-- use variable colors;
-
+  Addresses modal
 */
-
 .addresses {
-  
   main {
     width: 50vw;
     height: 350px;
@@ -115,7 +120,7 @@ footer {
         overflow: hidden;
 
         > li {
-          border-bottom: 1px solid #eee;
+          border-bottom: 1px solid $gray;
           padding: 10px 60px 10px 10px;
           position: relative;
           overflow: hidden;
@@ -140,7 +145,7 @@ footer {
           .address {
             transition: color 0.4s;
             font-size: 24px;
-            color: #222;
+            color: $black;
             flex: 10;
 
             p {
@@ -148,6 +153,10 @@ footer {
               word-break: break-all;
               line-height: 1.4em;
               width: 1000%;  
+
+              &::selection {
+                background: transparent;
+              }
             }
 
             input.text {
@@ -191,19 +200,19 @@ footer {
                   transition: font-size .3s ease;
 
                   &.principal{
-                    border: 1px solid #2c7;
+                    border: 1px solid $type-principal;
                     color: #2c7;
                   }
                   &.mobile{
-                    border: 1px solid #39d;
+                    border: 1px solid $type-mobile;
                     color: #39d;
                   }
                   &.home{
-                    border: 1px solid #e43;
+                    border: 1px solid $type-home;
                     color: #e43;
                   }
                   &.other{
-                    border: 1px solid #e82;
+                    border: 1px solid $type-other;
                     color: #e82;
                   }
 
@@ -222,16 +231,16 @@ footer {
                   border: none;
 
                   &.principal{
-                    background: #2c7;
+                    background: $type-principal;
                   }
                   &.mobile{
-                    background: #39d;
+                    background: $type-mobile;
                   }
                   &.home{
-                    background: #e43;
+                    background: $type-home;
                   }
                   &.other{
-                    background: #e82;
+                    background: $type-other;
                   }
                 }
 
@@ -308,16 +317,16 @@ footer {
             transition: opacity .3s ease;
 
             &.principal{
-              background: #2c7;
+              background: $type-principal;
             }
             &.mobile{
-              background: #39d;
+              background: $type-mobile;
             }
             &.home{
-              background: #e43;
+              background: $type-home;
             }
             &.other{
-              background: #e82;
+              background: $type-other;
             }
           }
 
@@ -329,6 +338,9 @@ footer {
               line-height: 1em;
             }
 
+            .address p::selection {
+              background: #2c7;
+            }
             .actions {
               opacity: 1;
             }
@@ -342,7 +354,7 @@ footer {
     }
 
     div.map {
-      border-left: 1px solid #eee;
+      border-left: 1px solid $gray;
       flex: 1;
     }
   }

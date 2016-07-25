@@ -4,6 +4,7 @@
 var webpack = require('webpack');
 var autoprefixer = require('autoprefixer');
 var nested = require('postcss-nested');
+var simpleVars = require('postcss-simple-vars');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -54,7 +55,8 @@ module.exports = function makeWebpackConfig () {
     autoprefixer({
       browsers: ['last 2 version']
     }),
-    nested
+    nested,
+    simpleVars
   ];
 
   config.plugins = [];

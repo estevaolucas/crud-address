@@ -7,7 +7,6 @@ import { Lead } from './services';
 
 import '../style/app.css';
 
-console.log(AddressController);
 angular.module('app', [uiRouter])
   .controller('AddressController', AddressController)
   
@@ -27,24 +26,13 @@ angular.module('app', [uiRouter])
 
       .state('address.add', {
         url: '/',
-        controller: 'AddressController',
-        controllerAs: 'addresses',
-        resolve: {
-          lead: ($stateParams) => {
-            // console.log('resolve', $stateParams);
-            return [0, 1, 2];
-            // return Lead($stateParams.leadId);
-          }
-        },
         views: {
           modal: {
             template: require('./add.html'),
+            controller: 'AddressController',
           },
         },
       });
-
-
-    // $urlRouterProvider.otherwise('addresses');
   });
 
 export default 'app';

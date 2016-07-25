@@ -253,6 +253,10 @@ footer {
 
               }
             }
+
+            input.text, ol {
+              display: none;
+            }
           }
 
           .actions {
@@ -351,9 +355,14 @@ footer {
             .actions {
               opacity: 1;
             }
-
             .ribbon {
               opacity: 0;
+            }
+          }
+
+          &.add-address {
+            input.text, ol {
+              display: block;
             }
           }
         }

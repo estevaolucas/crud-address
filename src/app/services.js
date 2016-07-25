@@ -28,6 +28,15 @@ export class Lead {
     
     return deferred.promise;
   }
+
+  addAddress(address) {
+    const deferred = this.$q.defer();
+
+    this.data.addresses.push(address);
+    deferred.resolve(this.data.addresses.slice());
+    
+    return deferred.promise;
+  }
 }
 
 Lead.$inject = ['$q'];

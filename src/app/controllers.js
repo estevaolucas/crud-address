@@ -6,9 +6,11 @@ export class AddressController {
   constructor($scope, $timeout, lead) {
     this.$scope = $scope;
 
-    $scope.lead = lead.data;
+    this.lead = lead;
+
+    $scope.lead = lead;
     $scope.list = lead.data.addresses;
-    $scope.label = 'principal';  
+    $scope.label = 'primary';  
     
     this.componentForm = {
       street_number: 'short_name',
@@ -137,7 +139,8 @@ export class AddressController {
     marker.setPosition(place.geometry.location);
     marker.setVisible(true);
 
-    this.$scope.$apply(() => this.$scope.list.push(address));
+    this.lead.addAddress(address).then(list => this.$scope.list = list);
+
     this.addInput.value = '';
   };
 }

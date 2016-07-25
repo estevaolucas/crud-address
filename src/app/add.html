@@ -1,6 +1,6 @@
 <div class="addresses modal-content">
   <header>
-    <h1>Addresses of Lead <strong>{{lead.name}}</strong></h1>
+    <h1>Addresses of Lead <strong>{{lead.data.name}}</strong></h1>
     <button class="btn-close" title="Close window">Close</button>
   </header>
   <main>
@@ -10,15 +10,15 @@
           <span class="num">{{$index + 1}}</span>
           <div class="address">
             <p>{{address.formatted}}</p>
-            <input type="text" class="text" placeholder="Add a new address" />
+            <input type="text" class="text" placeholder="Edit the address" />
             <ol>
               <li>
-                <input ng-model="address.label" type="radio" name="type" value="principal" id="principal" />
-                <label for="principal" class="principal">principal</label>
-                <input ng-model="address.label" type="radio" name="type" value="mobile" id="mobile" />
-                <label for="mobile" class="mobile">mobile</label>
-                <input ng-model="address.label" type="radio" name="type" value="other" id="other" checked />
-                <label for="other" class="other">other </label>
+                <input ng-model="address.label" type="radio" name="type" value="primary" id="primary{{$id}}" />
+                <label for="primary{{$id}}" class="primary">primary</label>
+                <input ng-model="address.label" type="radio" name="type" value="mobile" id="mobile{{$id}}" />
+                <label for="mobile{{$id}}" class="mobile">mobile</label>
+                <input ng-model="address.label" type="radio" name="type" value="other" id="other{{$id}}" />
+                <label for="other{{$id}}" class="other">other </label>
               </li>
             </ol>
           </div>
@@ -26,7 +26,7 @@
             <button type="button" class="btn-edit" title="Edit this address">Edit</button>
             <button type="button" class="btn-remove" title="Remove this address">Remove</button>
           </div>
-          <span class="ribbon principal">{{address.label}}</span>
+          <span class="ribbon {{address.label}}">{{address.label}}</span>
         </li>
         <li class="add-address">
           <span class="num">{{list.length + 1}}</span>
@@ -34,11 +34,11 @@
             <input type="text" class="text" placeholder="Add a new address" />
             <ol>
               <li>
-                <input ng-model="label" type="radio" name="type" value="principal" id="principal" />
-                <label for="principal" class="principal">principal</label>
+                <input ng-model="label" type="radio" name="type" value="primary" id="primary" />
+                <label for="primary" class="primary">primary</label>
                 <input ng-model="label" type="radio" name="type" value="mobile" id="mobile" />
                 <label for="mobile" class="mobile">mobile</label>
-                <input ng-model="label" type="radio" name="type" value="other" id="other" checked />
+                <input ng-model="label" type="radio" name="type" value="other" id="other" />
                 <label for="other" class="other">other </label>
               </li>
             </ol>

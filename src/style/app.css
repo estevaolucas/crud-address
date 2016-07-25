@@ -1,4 +1,4 @@
-$type-principal: #2c7;
+$type-primary: #2c7;
 $type-mobile: #39d;
 $type-home: #e43;
 $type-other: #e82;
@@ -206,8 +206,8 @@ footer {
 
                   transition: font-size .3s ease;
 
-                  &.principal{
-                    border: 1px solid $type-principal;
+                  &.primary{
+                    border: 1px solid $type-primary;
                     color: #2c7;
                   }
                   &.mobile{
@@ -237,8 +237,8 @@ footer {
                   color: white;
                   border: none;
 
-                  &.principal{
-                    background: $type-principal;
+                  &.primary{
+                    background: $type-primary;
                   }
                   &.mobile{
                     background: $type-mobile;
@@ -327,8 +327,8 @@ footer {
             
             transition: opacity .3s ease;
 
-            &.principal{
-              background: $type-principal;
+            &.primary{
+              background: $type-primary;
             }
             &.mobile{
               background: $type-mobile;

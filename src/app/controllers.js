@@ -18,6 +18,7 @@ export class AddressController {
     $scope.$remove = this.$remove.bind(this);
     $scope.$mouseenter = this.$mouseenter.bind(this);
     $scope.$mouseleave = this.$mouseleave.bind(this);
+    $scope.$addMouseenter = this.$addMouseenter.bind(this);
     
     this.componentForm = {
       streetNumber: ['short_name', 'street_number'],
@@ -28,6 +29,8 @@ export class AddressController {
       country: ['long_name', 'country'],
     };
 
+    this.googleMapsLoaded = false;
+    this.defaultPosition = {lat: 37.09024, lng: -95.712891};
     this.loadMaps();
   }
 
@@ -40,6 +43,7 @@ export class AddressController {
     const addressElem = document.querySelector('.addresses'),
       mapElem = addressElem.querySelector('.map');
 
+    this.googleMapsLoaded = true;
     this.addInput = addressElem.querySelector('.add-address input.text');
     this.addAutocomplete = new google.maps.places.Autocomplete(this.addInput, {types: ['geocode']});
     
@@ -53,9 +57,10 @@ export class AddressController {
     this.geocoder = new google.maps.Geocoder();
     this.bounds = new google.maps.LatLngBounds();
 
-    this.addCleanMarker();
+    // add one pin to each address
     this.addAddressesMarker();
 
+    // event handler for autocomplete
     google.maps.event.addListener(this.addAutocomplete, 'place_changed', () => {
       this.addAutocompleteHandler(this.addMarker, this.addAutocomplete.getPlace());
     });
@@ -66,38 +71,15 @@ export class AddressController {
         this.addAutocompleteHandler(this.addMarker, this.addAutocompletePlace);
       }
     });
-  }
 
-  addCleanMarker() {
-    this.addMarker = new google.maps.Marker({
-      map: this.map,
-      anchorPoint: new google.maps.Point(0, -29),
-      position: this.map.getCenter(),
-      draggable: true,
-      animation: google.maps.Animation.DROP,
-    });
-
-    this.markers.push(this.addMarker);
-    this.bounds.extend(this.addMarker.getPosition());
-
-    google.maps.event.addListener(this.addMarker, 'dragend', () => {
-      this.geocoder.geocode({
-        location: this.addMarker.getPosition()
-      }, (results, status) => {
-        this.bounds.extend(this.addMarker.getPosition());
-
-        if (status === google.maps.GeocoderStatus.OK && results[1]) {
-          this.addAutocompletePlace = results[1];
-          this.addInput.value = results[1].formatted_address;
-          this.addInput.focus();
-        }
-      });
-    });
+    // creat a pin that willl be used when add a new address
+    this.createAddMarker();
   }
 
   addAutocompleteHandler(marker, place) {
     const address = {};
 
+    // can be a place without not so deep, like a city or a state
     if (!place || !('formatted_address' in place)) {
       return;
     }
@@ -116,91 +98,152 @@ export class AddressController {
     });
 
     this.lead.addAddress(address).then(list => {
+      const addedMarker = new google.maps.Marker({
+        map: this.map,
+        anchorPoint: new google.maps.Point(0, -29),
+        position: place.geometry.location,
+      });
+
       this.$scope.list = list;
 
-      if (!place.geometry.viewport) {
-        const addedMarker = new google.maps.Marker({
-          map: this.map,
-          anchorPoint: new google.maps.Point(0, -29),
-          position: place.geometry.location,
-        });
+      // set a number to marker
+      this.setMarkerNumber(addedMarker, this.$scope.list.length);
 
-        // set a number to marker
-        this.markerIconNumber(addedMarker, this.$scope.list.length);
-
-        // adjust map position
-        this.bounds.extend(addedMarker.getPosition());
-        this.map.fitBounds(this.bounds);
-    
-        this.markers.push(addedMarker);
-        
-        // reset input to add a new address
-        this.addInput.value = '';
-      }
+      // adjust map position
+      this.bounds.extend(addedMarker.getPosition());
+      this.map.fitBounds(this.bounds);
+      
+      address.marker = addedMarker;
+      this.markers.push(addedMarker);
+      
+      // reset input to add a new address
+      this.addInput.value = '';
     });
   };
 
   addAddressesMarker() {
     this.lead.data.addresses.forEach((address, i) => {
       this.geocoder.geocode({
-          address: address.formatted
-        }, (results, status) => {
-          console.log('address', status, results);
-          if (status === google.maps.GeocoderStatus.OK && results.length) {
-            const marker = new google.maps.Marker({
-              map: this.map,
-              anchorPoint: new google.maps.Point(0, -29),
-              position: results[0].geometry.location,
-            }); 
+        address: address.formatted
+      }, (results, status) => {
+        if (status === google.maps.GeocoderStatus.OK && results.length) {
+          const marker = new google.maps.Marker({
+            map: this.map,
+            anchorPoint: new google.maps.Point(0, -29),
+            position: results[0].geometry.location,
+          }); 
 
-            // set a numered icon
-            this.markerIconNumber(marker, i + 1);
+          // set a numered icon
+          this.setMarkerNumber(marker, i + 1);
 
-            address.marker = marker;
-            this.markers.push(marker);
+          address.marker = marker;
+          this.markers.push(marker);
 
-            // adjust viewport to show all pins
-            this.bounds.extend(marker.getPosition());
+          // adjust viewport to show all pins
+          this.bounds.extend(marker.getPosition());
 
-            if (i == this.lead.data.addresses.length - 1) {
-              this.map.fitBounds(this.bounds);
-            }
+          if (i == this.lead.data.addresses.length - 1) {
+            this.map.fitBounds(this.bounds);
           }
-        });
+        }
+      });
     });
   }
 
-  markerIconNumber(marker, number) {
-    marker.setIcon(`http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=${number}|FE6256|000000`);
+  // Markers
+  createAddMarker() {
+    this.addMarker = new google.maps.Marker({
+      map: this.map,
+      anchorPoint: new google.maps.Point(0, -29),
+      position: this.defaultPosition,
+      draggable: true,
+      visible: false,
+      animation: google.maps.Animation.DROP,
+    });
+
+    google.maps.event.addListener(this.addMarker, 'dragend', () => {
+      this.geocoder.geocode({
+        location: this.addMarker.getPosition()
+      }, (results, status) => {
+        this.bounds.extend(this.addMarker.getPosition());
+
+        if (status === google.maps.GeocoderStatus.OK && results[1]) {
+          this.addAutocompletePlace = results[1];
+          this.addInput.value = results[1].formatted_address;
+          this.addInput.focus();
+        }
+      });
+    });
   }
 
-  // event listners
-  $edit(address) {
-    address.editing = true;
+  showAddMarker() {
+    this.map.setCenter(this.addMarker.getPosition());
+    this.addMarker.setVisible(true);
+
+    this.setMarkerNumber(this.addMarker, this.lead.data.addresses.length + 1);
   }
 
-  $remove(address) {
-    this.lead.removeAddress(address).then(list => this.$scope.list = list);
+  hideAddMarker() {
+    this.addMarker.setVisible(false);
   }
 
-  $mouseenter(address) {
-    if (!google) {
+  showMarkers() {
+    this.markers.forEach(m => m.setVisible(true));
+    this.map.fitBounds(this.bounds);
+  }
+
+  hideMarkers(marker) {
+    if (!this.googleMapsLoaded) {
       return;
     }
-    
+
     const bounds = new google.maps.LatLngBounds();
 
     this.markers.forEach(m => {
-      m.setVisible(m == address.marker);
-      m == address.marker && bounds.extend(m.getPosition());
+      m.setVisible(marker && m == marker);
+      marker && m == marker && bounds.extend(m.getPosition());
     });
 
     this.map.fitBounds(bounds);
   }
 
+  setMarkerNumber(marker, number) {
+    marker.setIcon(`http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=${number}|FE6256|000000`);
+  }
+
+  // Event listners
+  $edit(address) {
+    address.editing = true;
+  }
+
+  $remove(address) {
+    this.lead.removeAddress(address).then(list => {
+      this.lead.data.addresses = list;
+      this.$scope.list = list;
+
+      // remove old marker
+      address.marker.setMap(null);
+
+      // update markers number
+      list.forEach((a, i) => {
+        this.setMarkerNumber(a.marker, i + 1);
+      });
+    });
+  }
+
+  $mouseenter(address) {
+    this.hideMarkers(address.marker);
+    this.hideAddMarker();
+  }
+
   $mouseleave(address) {
-    this.markers.forEach(m => m.setVisible(true));
-    this.map.fitBounds(this.bounds);
+    this.showMarkers();
+    this.hideAddMarker();
+  }
+
+  $addMouseenter() {
+    this.hideMarkers();
+    this.showAddMarker(); 
   }
 }
 

@@ -3,10 +3,10 @@
     <h1>Addresses of Lead <strong>{{lead.data.name}}</strong></h1>
     <button class="btn-close" title="Close window">Close</button>
   </header>
-  <main>
+  <main ng-mouseleave="$mouseleave()">
     <aside>
       <ul>
-        <li ng-repeat="address in list track by $index" ng-mouseenter="$mouseenter(address)"  ng-mouseleave="$mouseleave(address)" ng-class="{editing: address.editing}">
+        <li ng-repeat="address in list track by $index" ng-mouseenter="$mouseenter(address)" ng-class="{editing: address.editing}">
           <span class="num">{{$index + 1}}</span>
           <div class="address">
             <p>{{address.formatted}}</p>
@@ -28,7 +28,7 @@
           </div>
           <span class="ribbon {{address.label}}">{{address.label}}</span>
         </li>
-        <li class="add-address">
+        <li class="add-address" ng-mouseenter="$addMouseenter()">
           <span class="num">{{list.length + 1}}</span>
           <div class="address">
             <input type="text" class="text" placeholder="Add a new address" />

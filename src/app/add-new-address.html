@@ -1,0 +1,16 @@
+<li class="add-address" ng-mouseenter="$over()">
+  <span class="num">{{list.length + 1}}</span>
+  <div class="address">
+    <input type="text" class="text" placeholder="Add a new address" />
+    <ol>
+      <li>
+        <input ng-model="label" type="radio" name="type" value="primary" id="primary" />
+        <label for="primary" class="primary">primary</label>
+        <input ng-model="label" type="radio" name="type" value="mobile" id="mobile" />
+        <label for="mobile" class="mobile">mobile</label>
+        <input ng-model="label" type="radio" name="type" value="other" id="other" />
+        <label for="other" class="other">other</label>
+      </li>
+    </ol>
+  </div>
+</li>

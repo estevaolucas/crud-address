@@ -12,12 +12,13 @@ export class AddressController {
     $scope.lead = lead;
     
     // events
+    $scope.$addComplete = this.$addComplete.bind(this);
     $scope.$edit = this.$edit.bind(this);
     $scope.$editComplete = this.$editComplete.bind(this);
     $scope.$remove = this.$remove.bind(this);
-    $scope.$over = this.$over.bind(this);
     $scope.$mouseleave = this.$mouseleave.bind(this);
-    $scope.$addMouseenter = this.$addMouseenter.bind(this);
+    $scope.$overOnAddress = this.$overOnAddress.bind(this);
+    $scope.$overOnAddAddress = this.$overOnAddAddress.bind(this);
 
     this.componentForm = {
       streetNumber: ['short_name', 'street_number'],
@@ -44,8 +45,6 @@ export class AddressController {
 
     this.modal = addressElem;
     this.googleMapsLoaded = true;
-    this.addInput = addressElem.querySelector('.add-address input.text');
-    this.addAutocomplete = new google.maps.places.Autocomplete(this.addInput, {types: ['geocode']});
     
     this.map = new google.maps.Map(mapElem, {
       zoom: 8,
@@ -60,72 +59,15 @@ export class AddressController {
     // add one pin to each address
     this.addAddressesMarker();
 
-    // event handler for autocomplete
-    google.maps.event.addListener(this.addAutocomplete, 'place_changed', () => {
-      this.addAutocompleteHandler(this.addMarker, this.addAutocomplete.getPlace());
-    });
-
-    // press enter key adds a new address
-    // this.addInput.addEventListener('keypress', e => {
-    //   if (e.keyCode == 13) {
-    //     this.addAutocompleteHandler(this.addMarker, this.addAutocompletePlace);
-    //   }
-    // });
-
     // creat a pin that willl be used when add a new address
     this.createAddMarker();
 
     // add data
     this.$scope.$apply(() => {
       this.$scope.list = this.lead.data.addresses;
-      this.$scope.label = 'primary';  
+      this.$scope.label = 'primary';
     });
   }
-
-  addAutocompleteHandler(marker, place) {
-    const address = {};
-
-    // can be a place without not so deep, like a city or a state
-    if (!place || !('formatted_address' in place)) {
-      return;
-    }
-
-    address.formatted = place.formatted_address;
-    address.label = this.$scope.label;
-
-    place.address_components.forEach(component => {
-      const addressType = component.types[0];
-
-      for (const c in this.componentForm) {
-        if (addressType === this.componentForm[c][1]) {
-          address[c] = component[this.componentForm[c][0]];
-        }
-      }
-    });
-
-    this.lead.addAddress(address).then(list => {
-      const addedMarker = new google.maps.Marker({
-        map: this.map,
-        anchorPoint: new google.maps.Point(0, -29),
-        position: place.geometry.location,
-      });
-
-      this.$scope.list = list;
-
-      // set a number to marker
-      this.setMarkerNumber(addedMarker, this.$scope.list.length);
-
-      // adjust map position
-      this.bounds.extend(addedMarker.getPosition());
-      this.map.fitBounds(this.bounds);
-      
-      address.marker = addedMarker;
-      this.markers.push(addedMarker);
-      
-      // reset input to add a new address
-      this.addInput.value = '';
-    });
-  };
 
   addAddressesMarker() {
     this.lead.data.addresses.forEach((address, i) => {
@@ -174,12 +116,15 @@ export class AddressController {
         this.bounds.extend(this.addMarker.getPosition());
 
         if (status === google.maps.GeocoderStatus.OK && results[1]) {
-          this.addAutocompletePlace = results[1];
-          this.addInput.value = results[1].formatted_address;
-          this.addInput.focus();
+          this.$scope.$apply(() => {
+            this.$scope.place = results[1];
+            this.$scope.value = results[1].formatted_address;            
+          });
         }
       });
     });
+
+    this.$scope.addMarker = this.addMarker;
   }
 
   showAddMarker() {
@@ -224,8 +169,32 @@ export class AddressController {
   }
 
   // Event listners
+  $addComplete(marker, place) {
+    this.lead.addAddress(address).then(list => {
+      const addedMarker = new google.maps.Marker({
+        map: this.map,
+        anchorPoint: new google.maps.Point(0, -29),
+        position: place.geometry.location,
+      });
+
+      this.$scope.list = list;
+
+      // set a number to marker
+      this.setMarkerNumber(addedMarker, this.$scope.list.length);
+
+      // adjust map position
+      this.bounds.extend(addedMarker.getPosition());
+      this.map.fitBounds(this.bounds);
+      
+      address.marker = addedMarker;
+      this.markers.push(addedMarker);
+      
+      // reset input to add a new address
+      this.addInputValue = '';
+    });
+  };
+  
   $edit(e, address) {
-    console.log('address', address);
     address.marker.setDraggable(true);
   }
 
@@ -250,7 +219,7 @@ export class AddressController {
     });
   }
 
-  $over(address) {
+  $overOnAddress(address) {
     if (!this.googleMapsLoaded) {
       return;
     }
@@ -265,7 +234,7 @@ export class AddressController {
     this.hideAddMarker();
   }
 
-  $addMouseenter() {
+  $overOnAddAddress() {
     this.hideMarkers();
     this.showAddMarker();
     this.cancelEditing();

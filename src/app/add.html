@@ -6,23 +6,8 @@
   <main ng-mouseleave="$mouseleave()">
     <aside>
       <ul>
-        <lead-address ng-repeat="address in list track by $index" address="address" index="$index" on-edit="$edit" on-edit-complete="$editComplete" on-remove="$remove" on-over="$over"></lead-address>
-        <li class="add-address" ng-mouseenter="$addMouseenter()">
-          <span class="num">{{list.length + 1}}</span>
-          <div class="address">
-            <input type="text" class="text" placeholder="Add a new address" />
-            <ol>
-              <li>
-                <input ng-model="label" type="radio" name="type" value="primary" id="primary" />
-                <label for="primary" class="primary">primary</label>
-                <input ng-model="label" type="radio" name="type" value="mobile" id="mobile" />
-                <label for="mobile" class="mobile">mobile</label>
-                <input ng-model="label" type="radio" name="type" value="other" id="other" />
-                <label for="other" class="other">other </label>
-              </li>
-            </ol>
-          </div>
-        </li>
+        <lead-address ng-repeat="address in list track by $index" address="address" index="$index" on-edit="$edit" on-edit-complete="$editComplete" on-remove="$remove" on-over="$overOnAddress"></lead-address>
+        <lead-add-new-address on-add="$addComplete" on-over="$overOnAddAddress" value="value" marker="addMarker" place="place" ng-if="label"></lead-add-new-address>
       </ul>
 
       <p class="empty" ng-show="!list.length">It doesn't have any address yet! Type the address above or drag the pin.</p>

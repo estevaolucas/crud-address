@@ -33,10 +33,6 @@ export class AddressDirective {
 
     scope.input = element[0].querySelector('input.text');
     
-    // scope.$edit = this.$edit.bind(this);
-    // scope.$remove = this.$remove.bind(this);
-    // scope.$over = this.$over.bind(this);
-
     scope.$edit = (e) => {
       scope.address.editing = true;
       scope.onEdit(e, scope.address);
@@ -130,3 +126,89 @@ export class AddressDirective {
 }
 
 AddressDirective.$inject = ['$scope'];
+
+export class AddNewAddressDirective {
+  constructor() {
+    this.restrict = 'E';
+    this.template = require('./add-new-address.html');
+    this.replace = true;
+    this.scope = {
+      onAdd: '=',
+      onOver: '=',
+      marker: '=',
+      value: '=',
+      place: '=',
+    };
+  }
+
+  controller($scope) {
+
+  }
+
+  link(scope, element, attrs) {
+    const componentForm = {
+      streetNumber: ['short_name', 'street_number'],
+      streetName: ['long_name', 'route'],
+      city: ['long_name', 'locality'],
+      state: ['short_name', 'administrative_area_level_1'],
+      zipcode: ['short_name', 'postal_code'],
+      country: ['long_name', 'country'],
+    };
+
+    this.scope = scope;
+
+    scope.input = element[0].querySelector('input.text');
+    scope.autocomplete = new google.maps.places.Autocomplete(scope.input, {
+      types: ['geocode']
+    });
+
+    google.maps.event.addListener(scope.autocomplete, 'place_changed', () => {
+      scope.autocompleteHandler(scope.autocomplete.getPlace());
+    });
+
+    // press enter key adds a new address
+    scope.input.addEventListener('keypress', e => {
+      if (e.keyCode == 13) {
+        scope.autocompleteHandler(scope.place);
+      }
+    });
+        
+    scope.autocompleteHandler = (place) => {
+      const address = {};
+
+      // can be a place without not so deep, like a city or a state
+      if (!place || !('formatted_address' in place)) {
+        return;
+      }
+
+      address.formatted = place.formatted_address;
+      address.label = scope.label;
+
+      place.address_components.forEach(component => {
+        const addressType = component.types[0];
+
+        for (const c in this.componentForm) {
+          if (addressType === this.componentForm[c][1]) {
+            address[c] = component[this.componentForm[c][0]];
+          }
+        }
+      });
+
+      scope.onAdd(address);
+    }
+
+    scope.$over = () => {
+      scope.onOver();
+    }
+
+    scope.$watch('value', (newValue, oldValue) => {
+      if (newValue === oldValue) {
+        return;
+      }
+
+      scope.input.value = scope.value;
+    });
+  }
+}
+
+AddNewAddressDirective.$inject = ['$scope'];

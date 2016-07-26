@@ -39,7 +39,16 @@ export class AddressDirective {
     }
 
     scope.$remove = () => {
-      scope.onRemove(this.scope.address);
+      scope.address.removing = true;
+    }
+
+    scope.$confirm = (confirm) => {
+      scope.address.removing = false;
+
+      if (confirm) {
+        // scope.onRemove(this.scope.address); 
+        scope.addError();
+      }
     }
 
     scope.$over = (address) => {
@@ -111,6 +120,12 @@ export class AddressDirective {
       address.editing = false;
 
       scope.address = address;
+    }
+
+    scope.addError = () => {
+      scope.error = true;
+
+      setTimeout(() => scope.error = false, 500);
     }
 
     const watch = scope.$watch('address.marker', (newValue, oldValue) => {

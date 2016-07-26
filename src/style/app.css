@@ -311,6 +311,55 @@ footer {
             }
           }
 
+          .remove {
+            transition: top .3s ease;
+
+            background: rgba(255, 255, 255, 0.95);
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            top: 100%;
+            left: 0;
+            z-index: 2;
+            padding: 4px;
+            text-align: center;
+
+            p {
+              color: $black;
+              font-size: 15px;
+            }
+
+            .buttons {
+              display: flex;
+              flex-direction: row;
+              flex-wrap: wrap;
+              align-items: center;
+              margin: 0 90px;
+
+              .btn-yes
+              , .btn-no {
+                cursor: pointer;
+                border: none;
+                height: 28px;
+                flex-grow: 1;
+                margin: 3px 10px 0;
+                border-radius: 25px;
+                background-color: #1b9;
+                color: white;
+                transition: background-color 0.3s ease;
+
+                &:hover
+                , &:focus {
+                  transform: scale(1.1);
+                }
+              }
+
+              .btn-no {
+                background-color: #e43;
+              }
+            }
+          }
+
           .ribbon {
             font-size: 9px;
             text-align: center;
@@ -343,7 +392,7 @@ footer {
 
           &:hover
           , &:focus {
-            p {
+            .address p {
               width: 80%;
               font-size: 14px;
               line-height: 1em;
@@ -372,6 +421,19 @@ footer {
               opacity: 0;
             }
           }
+
+          &.removing {
+            .remove {
+              top: 0;
+            }
+          }
+
+          &.error {
+            animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+            perspective: 1000px;
+          }
         }
       }
 
@@ -392,5 +454,23 @@ footer {
       border-left: 1px solid $gray;
       flex: 1;
     }
+  }
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(4px, 0, 0);
   }
 }

@@ -1,4 +1,4 @@
-<li ng-mouseenter="$over(address)" ng-class="{editing: address.editing}">
+<li ng-mouseenter="$over(address)" ng-class="{editing: address.editing, removing: address.removing, error: error}">
   <span class="num">{{index + 1}}</span>
   <div class="address">
     <p>{{address.formatted}}</p>
@@ -19,4 +19,11 @@
     <button type="button" class="btn-remove" ng-click="$remove(address)" title="Remove this address">Remove</button>
   </div>
   <span class="ribbon {{address.label}}">{{address.label}}</span>
+  <div class="remove">
+    <p>Are you sure to remove this address?</p>
+    <div class="buttons">
+      <button type="button" class="btn-yes" ng-click="$confirm(true)" title="Confirm removal">Yes</button>
+      <button type="button" class="btn-no" ng-click="$confirm(false)" title="Cancel removal">No</button>
+    </div>
+  </div>
 </li>

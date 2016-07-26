@@ -164,8 +164,11 @@ export class AddressController {
 
   cancelEditing() {
     this.$scope.list
-      .filter(address => address.editing)
-      .forEach(address => address.editing = false);
+      .filter(address => address.editing || address.removing)
+      .forEach(address => {
+        address.editing = false;
+        address.removing = false;
+      });
   }
 
   // Event listners

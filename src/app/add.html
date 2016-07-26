@@ -6,7 +6,7 @@
   <main ng-mouseleave="$mouseleave()">
     <aside>
       <ul>
-        <li ng-repeat="address in list track by $index" ng-mouseenter="$mouseenter(address)" ng-class="{editing: address.editing}">
+        <li ng-repeat="address in list track by $index" ng-mouseenter="$mouseenter(address)" ng-class="{editing: address.editing}" ng-init="$editAutocomplete(address, $index)">
           <span class="num">{{$index + 1}}</span>
           <div class="address">
             <p>{{address.formatted}}</p>
@@ -23,7 +23,7 @@
             </ol>
           </div>
           <div class="actions">
-            <button type="button" class="btn-edit" ng-click="$edit(address)" title="Edit this address">Edit</button>
+            <button type="button" class="btn-edit" ng-click="$edit($event, address)" title="Edit this address">Edit</button>
             <button type="button" class="btn-remove" ng-click="$remove(address)" title="Remove this address">Remove</button>
           </div>
           <span class="ribbon {{address.label}}">{{address.label}}</span>

@@ -10,16 +10,15 @@ export class AddressController {
 
     // data
     $scope.lead = lead;
-    $scope.list = lead.data.addresses;
-    $scope.label = 'primary';  
-
+    
     // events
     $scope.$edit = this.$edit.bind(this);
     $scope.$remove = this.$remove.bind(this);
     $scope.$mouseenter = this.$mouseenter.bind(this);
     $scope.$mouseleave = this.$mouseleave.bind(this);
     $scope.$addMouseenter = this.$addMouseenter.bind(this);
-    
+    $scope.$editAutocomplete = this.$editAutocomplete.bind(this);
+
     this.componentForm = {
       streetNumber: ['short_name', 'street_number'],
       streetName: ['long_name', 'route'],
@@ -43,6 +42,7 @@ export class AddressController {
     const addressElem = document.querySelector('.addresses'),
       mapElem = addressElem.querySelector('.map');
 
+    this.modal = addressElem;
     this.googleMapsLoaded = true;
     this.addInput = addressElem.querySelector('.add-address input.text');
     this.addAutocomplete = new google.maps.places.Autocomplete(this.addInput, {types: ['geocode']});
@@ -74,6 +74,12 @@ export class AddressController {
 
     // creat a pin that willl be used when add a new address
     this.createAddMarker();
+
+    // add data
+    this.$scope.$apply(() => {
+      this.$scope.list = this.lead.data.addresses;
+      this.$scope.label = 'primary';  
+    });
   }
 
   addAutocompleteHandler(marker, place) {
@@ -207,12 +213,87 @@ export class AddressController {
     this.map.fitBounds(bounds);
   }
 
+  cancelEditing() {
+    this.$scope.list
+      .filter(address => address.editing)
+      .forEach(address => address.editing = false);
+  }
+
   setMarkerNumber(marker, number) {
     marker.setIcon(`http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=${number}|FE6256|000000`);
   }
 
+  addEditAutocomplete(address, index) {
+    const input = this.modal.querySelectorAll('input.text')[index];
+  
+    let place = false;;
+
+    if (!('autocomplete' in address)) {
+      const autocomplete = new google.maps.places.Autocomplete(input, {types: ['geocode']});
+
+      google.maps.event.addListener(autocomplete, 'place_changed', () => {
+        this.editAutocompleteHandler(address, autocomplete.getPlace());
+      });
+
+      // press enter key adds a new address
+      input.addEventListener('keypress', e => {
+        if (e.keyCode == 13) {
+          this.editAutocompleteHandler(address, place);
+        }
+      });
+
+      google.maps.event.addListener(address.marker, 'dragend', () => {
+        this.geocoder.geocode({
+          location: address.marker.getPosition()
+        }, (results, status) => {
+          if (status === google.maps.GeocoderStatus.OK && results[1]) {
+            place = results[1];
+            input.value = results[1].formatted_address;
+            input.focus();
+          }
+        });
+      });
+
+      address.autocomplete = autocomplete;
+    }
+  }
+
+  editAutocompleteHandler(address, place) {
+    if (!place || !('formatted_address' in place)) {
+      this.$scope.$apply(() => {
+        address.marker.setDraggable(false);
+        address.editing = false;
+      });
+
+      return;
+    }
+
+    address.formatted = place.formatted_address;
+    address.label = this.$scope.label;
+
+    place.address_components.forEach(component => {
+      const addressType = component.types[0],
+        editedMarker = address.marker;
+
+      for (const c in this.componentForm) {
+        if (addressType === this.componentForm[c][1]) {
+          address[c] = component[this.componentForm[c][0]];
+        }
+      }
+    });
+
+    this.lead.editAddress(address).then(list => {
+      this.$scope.list = list;
+      input.value = '';
+    });
+
+    address.marker.setDraggable(false);
+    address.editing = false;
+  }
+
   // Event listners
-  $edit(address) {
+  $edit(e, address) {
+    address.marker.setDraggable(true);
     address.editing = true;
   }
 
@@ -232,8 +313,13 @@ export class AddressController {
   }
 
   $mouseenter(address) {
+    if (!this.googleMapsLoaded) {
+      return;
+    }
+
     this.hideMarkers(address.marker);
     this.hideAddMarker();
+    this.cancelEditing();
   }
 
   $mouseleave(address) {
@@ -243,7 +329,12 @@ export class AddressController {
 
   $addMouseenter() {
     this.hideMarkers();
-    this.showAddMarker(); 
+    this.showAddMarker();
+    this.cancelEditing();
+  }
+
+  $editAutocomplete(address, index) {
+    this.addEditAutocomplete(address, index);
   }
 }
 

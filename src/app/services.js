@@ -47,12 +47,12 @@ export class Lead {
       zipcode: address.zipcode || '',
     }
 
-    return a
+    return a;
   }
 
   addAddress(address) {
     const deferred = this.$q.defer();
-    
+
     this.$http.post(`${this.baseUrl}/leads/${this.id}/addresses`, this.prepareToSend(address))
       .then((response) => {
         this.data.addresses.push(angular.extend({}, address, response.data));

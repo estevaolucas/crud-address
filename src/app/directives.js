@@ -152,6 +152,7 @@ export class AddNewAddressDirective {
       marker: '=',
       value: '=',
       place: '=',
+      index: '=',
     };
   }
 

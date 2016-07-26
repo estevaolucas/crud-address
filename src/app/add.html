@@ -7,7 +7,7 @@
     <aside>
       <ul>
         <lead-address ng-repeat="address in list track by $index" address="address" index="$index" on-edit="$edit" on-edit-complete="$editComplete" on-remove="$remove" on-over="$overOnAddress"></lead-address>
-        <lead-add-new-address on-add="$addComplete" on-over="$overOnAddAddress" value="value" marker="addMarker" place="place" ng-if="label"></lead-add-new-address>
+        <lead-add-new-address on-add="$addComplete" on-over="$overOnAddAddress" value="value" marker="addMarker" index="list.length + 1" place="place" ng-if="label"></lead-add-new-address>
       </ul>
 
       <p class="empty" ng-show="!list.length">It doesn't have any address yet! Type the address above or drag the pin.</p>

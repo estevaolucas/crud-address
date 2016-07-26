@@ -6,10 +6,13 @@ export class AddressController {
   constructor($scope, $timeout, lead) {
     this.$scope = $scope;
 
-    this.lead = lead;
-
     // data
-    $scope.lead = lead;
+    this.lead = lead;
+    this.$scope.lead = lead;
+
+    this.googleMapsLoaded = false;
+    this.defaultPosition = {lat: 37.09024, lng: -95.712891};
+    this.loadMaps();
     
     // events
     $scope.$addComplete = this.$addComplete.bind(this);
@@ -19,19 +22,6 @@ export class AddressController {
     $scope.$mouseleave = this.$mouseleave.bind(this);
     $scope.$overOnAddress = this.$overOnAddress.bind(this);
     $scope.$overOnAddAddress = this.$overOnAddAddress.bind(this);
-
-    this.componentForm = {
-      streetNumber: ['short_name', 'street_number'],
-      streetName: ['long_name', 'route'],
-      city: ['long_name', 'locality'],
-      state: ['short_name', 'administrative_area_level_1'],
-      zipcode: ['short_name', 'postal_code'],
-      country: ['long_name', 'country'],
-    };
-
-    this.googleMapsLoaded = false;
-    this.defaultPosition = {lat: 37.09024, lng: -95.712891};
-    this.loadMaps();
   }
 
   loadMaps() {
@@ -173,24 +163,30 @@ export class AddressController {
 
   // Event listners
   $addComplete(address, place) {
-    return this.lead.addAddress(address).then(list => {
-      const addedMarker = new google.maps.Marker({
+    return this.lead.addAddress(address).then((list) => {
+      const marker = new google.maps.Marker({
         map: this.map,
         anchorPoint: new google.maps.Point(0, -29),
         position: place.geometry.location,
       });
 
-      this.$scope.list = list;
-
       // set a number to marker
-      this.setMarkerNumber(addedMarker, this.$scope.list.length);
+      this.setMarkerNumber(marker, this.$scope.list.length);
 
       // adjust map position
-      this.bounds.extend(addedMarker.getPosition());
+      this.bounds.extend(marker.getPosition());
       this.map.fitBounds(this.bounds);
       
-      address.marker = addedMarker;
-      this.markers.push(addedMarker);
+      this.markers.push(marker);
+      this.$scope.list = list.map(a => {
+        if (a.formatted == address.formatted) {
+          a.marker = marker;
+        }
+
+        return a;
+      });
+
+      this.$overOnAddAddress();
     });
   };
   

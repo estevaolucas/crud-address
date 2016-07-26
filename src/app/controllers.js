@@ -172,8 +172,8 @@ export class AddressController {
   }
 
   // Event listners
-  $addComplete(marker, place) {
-    this.lead.addAddress(address).then(list => {
+  $addComplete(address, place) {
+    return this.lead.addAddress(address).then(list => {
       const addedMarker = new google.maps.Marker({
         map: this.map,
         anchorPoint: new google.maps.Point(0, -29),
@@ -191,9 +191,6 @@ export class AddressController {
       
       address.marker = addedMarker;
       this.markers.push(addedMarker);
-      
-      // reset input to add a new address
-      this.addInputValue = '';
     });
   };
   
@@ -202,19 +199,21 @@ export class AddressController {
   }
 
   $editComplete(address) {
-    this.lead.editAddress(address).then(list => {
+    return this.lead.editAddress(address).then(list => {
       this.$scope.list = list;
     });
   }
 
   $remove(address) {
-    this.lead.removeAddress(address).then(list => {
+    return this.lead.removeAddress(address).then(list => {
       this.lead.data.addresses = list;
       this.$scope.list = list;
 
       // remove old marker
-      address.marker.setMap(null);
-
+      if ('marker' in address) {
+        address.marker.setMap(null);
+      }
+      
       // update markers number
       list.forEach((a, i) => {
         this.setMarkerNumber(a.marker, i + 1);

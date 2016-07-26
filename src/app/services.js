@@ -1,51 +1,66 @@
 'use strict';
 
 export class Lead {
-  constructor($q) {
+  constructor($q, $http) {
     this.$q = $q;
+    this.$http = $http;
+
+    this.baseUrl = 'http://localhost:3000';
   }
 
   // TODO: simulate with a simple server
   fetchData(leadId) {
-    const deferred = this.$q.defer(),
-      lead = {
-        name: 'Close.id (SampleLead)',
-        addresses: [{
-          address_1: '501 Forest Ave',
-          address_2: 'Suite 1201',
-          city: 'Palo Alto',
-          country: 'US',
-          label: 'primary',
-          state: 'CA',
-          zipcode: '94301',
+    const deferred = this.$q.defer();
 
-          formatted: '501 Forest Ave, Suite 1201, Palo Alto, CA, US - 94301',
-        },
-        {
-          address_1: 'casa 15',
-          address_2: 'QNP 16 conjunto Q',
-          city: 'Ceilândia',
-          country: 'Brasil',
-          label: 'primary',
-          state: 'DF',
-          zipcode: '72231617',
+    this.id = leadId;
 
-          formatted: 'QNP 16 conjunto Q 24, Ceilandia, Brasil - 72231617',
-        }]
-      };
+    this.$http.get(`${this.baseUrl}/leads/${leadId}?_embed=addresses`)
+      .then((response) => {
+        this.data = this.normalize(response.data);
+        
+        deferred.resolve(this);
+      }, (error) => {
+        deferred.reject(error);
+      })
 
-    this.data = lead;
-    deferred.resolve(this);
-    
     return deferred.promise;
+  }
+
+  normalize(data) {
+    data.addresses.map((a) => {
+      // needed to present for autocomplete
+      a.formatted = `${a.address_1} ${a.address_2}, ${a.city}, ${a.state}, ${a.country} - ${a.zipcode}`;
+      return a;
+    });
+
+    return data;
+  }
+
+  prepareToSend(address) {
+    const a = {
+      address_1: address.address_1 || '',
+      address_2: address.address_2 || '',
+      city: address.city,
+      country: address.country,
+      label: address.label,
+      state: address.state,
+      zipcode: address.zipcode || '',
+    }
+
+    return a
   }
 
   addAddress(address) {
     const deferred = this.$q.defer();
-
-    this.data.addresses.push(address);
-    deferred.resolve(this.data.addresses.slice());
     
+    this.$http.post(`${this.baseUrl}/leads/${this.id}/addresses`, this.prepareToSend(address))
+      .then((response) => {
+        this.data.addresses.push(angular.extend({}, address, response.data));
+        deferred.resolve(this.data.addresses.slice());
+      }, (error) => {
+        deferred.reject(error);
+      })
+
     return deferred.promise;
   }
 
@@ -59,13 +74,18 @@ export class Lead {
   }
 
   removeAddress(address) {
-    const deferred = this.$q.defer();
+    const deferred = this.$q.defer()
 
-    this.data.addresses.splice(this.data.addresses.indexOf(address), 1);
-    deferred.resolve(this.data.addresses.slice());
-    
+    this.$http.delete(`${this.baseUrl}/addresses/${address.id}`)
+      .then((response) => {
+        this.data.addresses.splice(this.data.addresses.indexOf(address), 1);
+        deferred.resolve(this.data.addresses.slice());
+      }, (error) => {
+        deferred.reject(error);
+      })
+
     return deferred.promise; 
   }
 }
 
-Lead.$inject = ['$q'];
+Lead.$inject = ['$q', '$http'];

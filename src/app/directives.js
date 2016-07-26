@@ -46,8 +46,7 @@ export class AddressDirective {
       scope.address.removing = false;
 
       if (confirm) {
-        // scope.onRemove(this.scope.address); 
-        scope.addError();
+        scope.onRemove(scope.address).then(() => {}, () => scope.addError());
       }
     }
 
@@ -93,7 +92,7 @@ export class AddressDirective {
 
     scope.editAutocompleteHandler = (address, place) => {
       if (!place || !('formatted_address' in place)) {
-        this.scope.$apply(() => {
+        scope.$apply(() => {
           address.marker.setDraggable(false);
           address.editing = false;
         });
@@ -162,16 +161,15 @@ export class AddNewAddressDirective {
 
   link(scope, element, attrs) {
     const componentForm = {
-      streetNumber: ['short_name', 'street_number'],
-      streetName: ['long_name', 'route'],
+      address_1: ['short_name', 'street_number'],
+      address_2: ['long_name', 'route'],
       city: ['long_name', 'locality'],
       state: ['short_name', 'administrative_area_level_1'],
       zipcode: ['short_name', 'postal_code'],
       country: ['long_name', 'country'],
     };
 
-    this.scope = scope;
-
+    scope.label = 'other';
     scope.input = element[0].querySelector('input.text');
     scope.autocomplete = new google.maps.places.Autocomplete(scope.input, {
       types: ['geocode']
@@ -202,14 +200,19 @@ export class AddNewAddressDirective {
       place.address_components.forEach(component => {
         const addressType = component.types[0];
 
-        for (const c in this.componentForm) {
-          if (addressType === this.componentForm[c][1]) {
-            address[c] = component[this.componentForm[c][0]];
+        for (const c in componentForm) {
+          if (addressType === componentForm[c][1]) {
+            address[c] = component[componentForm[c][0]];
           }
         }
       });
 
-      scope.onAdd(address);
+      scope.onAdd(address, place)
+        .then(() => {
+          scope.input.value = '';
+          scope.type = 'other';
+        }, 
+        () => scope.addError());
     }
 
     scope.$over = () => {

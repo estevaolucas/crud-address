@@ -4,12 +4,14 @@ import angular from 'angular';
 import uiRouter from 'angular-ui-router';
 import { AddressController } from './controllers';
 import { Lead } from './services';
+import { AddressDirective } from './directives';
 
 import '../style/app.css';
 
 angular.module('app', [uiRouter])
   .controller('AddressController', AddressController)
   .service('Lead', Lead)
+  .directive('leadAddress', () => new AddressDirective)
 
   .config(($stateProvider, $urlRouterProvider) => {
     $stateProvider

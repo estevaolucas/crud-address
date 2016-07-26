@@ -1,0 +1,22 @@
+<li ng-mouseenter="$over(address)" ng-class="{editing: address.editing}">
+  <span class="num">{{index + 1}}</span>
+  <div class="address">
+    <p>{{address.formatted}}</p>
+    <input type="text" class="text" placeholder="Edit the address" value="{{address.formatted}}" />
+    <ol>
+      <li>
+        <input ng-model="address.label" type="radio" name="type" value="primary" id="primary{{index}}" />
+        <label for="primary{{index}}" class="primary">primary</label>
+        <input ng-model="address.label" type="radio" name="type" value="mobile" id="mobile{{index}}" />
+        <label for="mobile{{index}}" class="mobile">mobile</label>
+        <input ng-model="address.label" type="radio" name="type" value="other" id="other{{index}}" />
+        <label for="other{{index}}" class="other">other </label>
+      </li>
+    </ol>
+  </div>
+  <div class="actions">
+    <button type="button" class="btn-edit" ng-click="$edit($event, address)" title="Edit this address">Edit</button>
+    <button type="button" class="btn-remove" ng-click="$remove(address)" title="Remove this address">Remove</button>
+  </div>
+  <span class="ribbon {{address.label}}">{{address.label}}</span>
+</li>

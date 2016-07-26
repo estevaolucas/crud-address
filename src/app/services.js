@@ -49,6 +49,15 @@ export class Lead {
     return deferred.promise;
   }
 
+  editAddress(address) {
+    const deferred = this.$q.defer();
+
+    this.data.addresses[this.data.addresses.indexOf(address)] = address;
+    deferred.resolve(this.data.addresses.slice());
+    
+    return deferred.promise; 
+  }
+
   removeAddress(address) {
     const deferred = this.$q.defer();
 

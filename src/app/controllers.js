@@ -25,6 +25,7 @@ export class AddressController {
   }
 
   loadMaps() {
+    GoogleMapsLoader.KEY = 'AIzaSyA-EiU2h8cvuoqIan0fEQ0XqbGAgxlpy8A';
     GoogleMapsLoader.LIBRARIES = ['places'];
     GoogleMapsLoader.load(google => this.buildMap());
   }

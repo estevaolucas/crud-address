@@ -1,6 +1,6 @@
 <div class="addresses modal-content">
   <header>
-    <h1>Addresses of Lead <strong>{{lead.data.name}}</strong></h1>
+    <h1>Addresses of <strong>{{lead.data.name}}</strong></h1>
     <button class="btn-close" title="Close window">Close</button>
   </header>
   <main ng-mouseleave="$mouseleave()">
@@ -13,7 +13,8 @@
       <p class="empty" ng-show="!list.length">It doesn't have any address yet! Type the address above or drag the pin.</p>
     </aside>
     <div class="map">
-      
+      <input id="pac-input" class="controls" type="text" placeholder="Enter a location" />
+      <div></div>  
     </div>
   </main>
 <div>

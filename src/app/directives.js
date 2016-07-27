@@ -1,5 +1,14 @@
 'use strict';
 
+const componentForm = {
+  address_1: ['short_name', 'street_number'],
+  address_2: ['long_name', 'route'],
+  city: ['long_name', 'locality'],
+  state: ['short_name', 'administrative_area_level_1'],
+  zipcode: ['short_name', 'postal_code'],
+  country: ['short_name', 'country'],
+};
+
 export class AddressDirective {
   constructor() {
     this.restrict = 'E';
@@ -15,20 +24,7 @@ export class AddressDirective {
     };
   }
 
-  controller($scope) {
-
-  }
-
   link(scope, element, attrs) {
-    const componentForm = {
-      streetNumber: ['short_name', 'street_number'],
-      streetName: ['long_name', 'route'],
-      city: ['long_name', 'locality'],
-      state: ['short_name', 'administrative_area_level_1'],
-      zipcode: ['short_name', 'postal_code'],
-      country: ['long_name', 'country'],
-    };
-
     this.scope = scope;
 
     scope.input = element[0].querySelector('input.text');
@@ -156,21 +152,8 @@ export class AddNewAddressDirective {
     };
   }
 
-  controller($scope) {
-
-  }
-
   link(scope, element, attrs) {
-    const componentForm = {
-      address_1: ['short_name', 'street_number'],
-      address_2: ['long_name', 'route'],
-      city: ['long_name', 'locality'],
-      state: ['short_name', 'administrative_area_level_1'],
-      zipcode: ['short_name', 'postal_code'],
-      country: ['long_name', 'country'],
-    };
-
-    scope.label = 'other';
+    scope.label = scope.index == 1 ? 'primary' : 'other';
     scope.input = element[0].querySelector('input.text');
     scope.autocomplete = new google.maps.places.Autocomplete(scope.input, {
       types: ['geocode']
@@ -211,7 +194,7 @@ export class AddNewAddressDirective {
       scope.onAdd(address, place)
         .then(() => {
           scope.input.value = '';
-          scope.type = 'other';
+          scope.label = 'other';
         }, 
         () => scope.addError());
     }

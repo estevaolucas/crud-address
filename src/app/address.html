@@ -1,7 +1,7 @@
 <li ng-mouseenter="$over(address)" ng-class="{editing: address.editing, removing: address.removing, error: error}">
   <span class="num">{{index + 1}}</span>
   <div class="address">
-    <p>{{address.formatted}}</p>
+    <div class="place"><p>{{address.formatted}}</p></div>
     <input type="text" class="text" placeholder="Edit the address" value="{{address.formatted}}" />
     <ol>
       <li>
@@ -18,7 +18,7 @@
     <button type="button" class="btn-edit" ng-click="$edit($event, address)" title="Edit this address">Edit</button>
     <button type="button" class="btn-remove" ng-click="$remove(address)" title="Remove this address">Remove</button>
   </div>
-  <span class="ribbon {{address.label}}">{{address.label}}</span>
+  <span ng-show="address.label.length" class="ribbon {{address.label}}">{{address.label}}</span>
   <div class="remove">
     <p>Are you sure to remove this address?</p>
     <div class="buttons">

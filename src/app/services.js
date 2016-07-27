@@ -16,7 +16,7 @@ export class Lead {
 
     this.$http.get(`${this.baseUrl}/leads/${leadId}?_embed=addresses`)
       .then((response) => {
-        this.data = this.normalize(response.data);
+        this.data = response.data;
         
         deferred.resolve(this);
       }, (error) => {
@@ -24,16 +24,6 @@ export class Lead {
       })
 
     return deferred.promise;
-  }
-
-  normalize(data) {
-    data.addresses.map((a) => {
-      // needed to present for autocomplete
-      a.formatted = `${a.address_1} ${a.address_2}, ${a.city}, ${a.state}, ${a.country} - ${a.zipcode}`;
-      return a;
-    });
-
-    return data;
   }
 
   prepareToSend(address) {
@@ -45,6 +35,7 @@ export class Lead {
       label: address.label,
       state: address.state,
       zipcode: address.zipcode || '',
+      formatted: address.formatted
     }
 
     return a;

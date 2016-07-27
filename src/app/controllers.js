@@ -30,10 +30,10 @@ export class AddressController {
   }
 
   buildMap() {
-    const addressElem = document.querySelector('.addresses'),
-      mapElem = addressElem.querySelector('.map');
+    const modal = document.querySelector('.addresses'),
+      mapElem = modal.querySelector('.map div');
 
-    this.modal = addressElem;
+    this.modal = modal;
     this.googleMapsLoaded = true;
     
     this.map = new google.maps.Map(mapElem, {
@@ -48,9 +48,10 @@ export class AddressController {
 
     // add one pin to each address
     this.addAddressesMarker();
-
-    // creat a pin that willl be used when add a new address
+    // create a pin that willl be used when add a new address
     this.createAddMarker();
+    // a better way to search for a place
+    this.addSerchBox();
 
     // add data
     this.$scope.$apply(() => {
@@ -88,6 +89,33 @@ export class AddressController {
     });
   }
 
+  addSerchBox() {
+    const input = this.modal.querySelector('.map input'),
+      autocomplete = new google.maps.places.Autocomplete(input);
+    
+    autocomplete.bindTo('bounds', this.map);
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace();
+      
+      this.hideMarkers();
+      
+      // if the place has a geometry, then present it on a map.
+      if (place.geometry.viewport) {
+        this.map.fitBounds(place.geometry.viewport);
+      } else {
+        this.map.setCenter(place.geometry.location);
+        this.map.setZoom(17);
+      }
+
+      this.addMarker.setPosition(place.geometry.location);
+      this.addMarker.setAnimation(null);
+      this.addMarker.setVisible(true);
+      this.addMarker.setAnimation(google.maps.Animation.DROP);
+    });
+
+    this.searchBoxInput = input;
+  }
+
   // Markers
   createAddMarker() {
     this.addMarker = new google.maps.Marker({
@@ -109,10 +137,13 @@ export class AddressController {
           this.$scope.$apply(() => {
             this.$scope.place = results[1];
             this.$scope.value = results[1].formatted_address;            
+            this.searchBoxInput.value = results[1].formatted_address;
           });
         }
       });
     });
+
+    this.setMarkerNumber(this.addMarker, this.lead.data.addresses.length + 1);
 
     this.$scope.addMarker = this.addMarker;
   }
@@ -185,6 +216,8 @@ export class AddressController {
 
         return a;
       });
+
+      this.searchBoxInput.value = '';
 
       this.$overOnAddAddress();
     });

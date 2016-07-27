@@ -1,0 +1,24 @@
+<!doctype html>
+  <html ng-app="app" lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Angular App</title>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    
+    <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <base href="/">
+  <link href="/app.3ed5b818f876d9269d6b.css" rel="stylesheet"></head>
+  <body>
+    <main>
+      <h1 class="title">Hello! </h1>
+    </main>
+    <footer>
+      <a ui-sref="address.add({leadId: 1})">Open modal with 2 addresses</a> or <a ui-sref="address.add({leadId: 2})">no address</a>
+
+    </footer>
+
+    <div ui-view="modal" autoscroll="false"></div>
+  <script type="text/javascript" src="/app.3ed5b818f876d9269d6b.js"></script></body>
+</html>

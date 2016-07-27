@@ -5,7 +5,7 @@ export class Lead {
     this.$q = $q;
     this.$http = $http;
 
-    this.baseUrl = 'http://localhost:3000';
+    this.baseUrl = 'https://address-crud.herokuapp.com';
   }
 
   // TODO: simulate with a simple server

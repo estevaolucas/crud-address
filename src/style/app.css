@@ -15,7 +15,6 @@ $black: #222;
 }
 
 body {
-  background: red;
   font-family: 'Open Sans', sans-serif;
 }
 
@@ -409,11 +408,11 @@ footer {
               p {
                 font-size: 14px;
                 line-height: 1em;
-              }
-            }
 
-            .address p::selection {
-              background: #2c7;
+                &::selection {
+                  background: #2c7;
+                }
+              }
             }
             .actions {
               opacity: 1;

@@ -186,7 +186,7 @@ export class AddressController {
   }
 
   setMarkerNumber(marker, number) {
-    marker.setIcon(`http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=${number}|FE6256|000000`);
+    marker.setIcon(`//chart.apis.google.com/chart?chst=d_map_pin_letter&chld=${number}|FE6256|000000`);
   }
 
   cancelEditing(a) {

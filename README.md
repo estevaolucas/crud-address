@@ -1,5 +1,4 @@
 #### TODO
-* #must - create a build command
 * #must - update this file with install/run steps
 * #bug - default label after add a new address
 * #bug - restore state when an edit is canceled

@@ -38,25 +38,46 @@ export class Lead {
       formatted: address.formatted
     }
 
+    if ('leadId' in address) {
+      a.leadId = address.leadId;
+    }
+
     return a;
   }
 
   addAddress(address) {
-    const deferred = this.$q.defer();
+    const deferred = this.$q.defer(),
+      url = `${this.baseUrl}/leads/${this.id}/addresses`;
 
-    this.$http.post(`${this.baseUrl}/leads/${this.id}/addresses`, this.prepareToSend(address))
+    this.$http.post(url, this.prepareToSend(address))
       .then((response) => {
         this.data.addresses.push(angular.extend({}, address, response.data));
         deferred.resolve(this.data.addresses.slice());
       }, (error) => {
         deferred.reject(error);
-      })
+      });
 
     return deferred.promise;
   }
 
   editAddress(address) {
-    const deferred = this.$q.defer();
+    const deferred = this.$q.defer(),
+      url = `${this.baseUrl}/addresses/${address.id}`;
+
+    this.$http.put(url, this.prepareToSend(address))
+      .then((response) => {
+        this.data.addresses.forEach(a => {
+          if (a.id == response.data.id) {
+            a = response.data;
+          }
+
+          return a;
+        });
+
+        deferred.resolve(this.data.addresses.slice());
+      }, (error) => {
+        deferred.reject(error);
+      });
 
     this.data.addresses[this.data.addresses.indexOf(address)] = address;
     deferred.resolve(this.data.addresses.slice());

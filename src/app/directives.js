@@ -109,7 +109,7 @@ export class AddressDirective {
         }
       });
 
-      this.onEditComplete(address);
+      scope.onEditComplete(address);
 
       address.marker.setDraggable(false);
       address.editing = false;

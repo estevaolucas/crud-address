@@ -96,9 +96,10 @@ export class AddressController {
     autocomplete.bindTo('bounds', this.map);
     autocomplete.addListener('place_changed', () => {
       const place = autocomplete.getPlace();
-      
+      let marker = this.addMarker;
+
       this.hideMarkers();
-      
+
       // if the place has a geometry, then present it on a map.
       if (place.geometry.viewport) {
         this.map.fitBounds(place.geometry.viewport);
@@ -107,10 +108,14 @@ export class AddressController {
         this.map.setZoom(17);
       }
 
-      this.addMarker.setPosition(place.geometry.location);
-      this.addMarker.setAnimation(null);
-      this.addMarker.setVisible(true);
-      this.addMarker.setAnimation(google.maps.Animation.DROP);
+      if (this.editingAddress) {
+        marker = this.editingAddress.marker;
+      }
+
+      marker.setPosition(place.geometry.location);
+      marker.setAnimation(null);
+      marker.setVisible(true);
+      marker.setAnimation(google.maps.Animation.DROP);
     });
 
     this.searchBoxInput = input;
@@ -183,12 +188,14 @@ export class AddressController {
     marker.setIcon(`http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=${number}|FE6256|000000`);
   }
 
-  cancelEditing() {
+  cancelEditing(a) {
     this.$scope.list
-      .filter(address => address.editing || address.removing)
+      .filter(address => a !== address && (address.editing || address.removing))
       .forEach(address => {
         address.editing = false;
         address.removing = false;
+
+        this.editingAddress = null;
       });
   }
 
@@ -225,12 +232,16 @@ export class AddressController {
   
   $edit(e, address) {
     address.marker.setDraggable(true);
+    this.editingAddress = address;
   }
 
   $editComplete(address) {
     return this.lead.editAddress(address).then(list => {
       this.$scope.list = list;
     });
+
+    this.editingAddress = null;
+    this.searchBoxInput.value = '';
   }
 
   $remove(address) {
@@ -257,7 +268,7 @@ export class AddressController {
 
     this.hideMarkers(address.marker);
     this.hideAddMarker();
-    this.cancelEditing();
+    this.cancelEditing(address);
   }
 
   $mouseleave(address) {
